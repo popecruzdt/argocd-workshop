@@ -70,6 +70,17 @@ login to the web ui in your browser
 ```
 https://<EXTERNAL-IP>
 ```
+#### Custom ArgoCD Namespace -> Modify ClusterRoleBinding Namespace
+argocd expects to be installed into `argocd` namespace.  modify `ClusterRoleBinding` to match custom namespace.\
+locate the (`2`) instances of the below config in `/argocd/2-7-9/argocd-cluster-role-binding.yaml` and replace value.
+```
+namespace: <your-name>-argocd
+```
+apply the `ClusterRoleBinding`
+```
+kubectl apply -f /argocd/2-7-9/argocd-cluster-role-binding.yaml
+```
+
 #### Configure Dynatrace Prometheus Scrape
 update `argocd-metrics` kubernetes service with dynatrace annotations
 ```
