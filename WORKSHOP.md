@@ -1,5 +1,19 @@
 ## ArgoCD + Dynatrace Workshop
 
+### Terminal Prep
+set git repo as env variable
+```
+export REPO=https://github.com/<username>/<this-repo>.git
+```
+clone repo to terminal
+```
+git clone $REPO
+```
+change directory to repo base
+```
+cd argocd-workshop
+```
+
 ### ArgoCD Setup
 set argocd namespace name as env variable, using only alpha and hyphens (no spaces, etc)
 ```
@@ -22,7 +36,7 @@ sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
 rm argocd-linux-amd64
 ```
 
-change UI server service from ClusterIP to LoadBalancer (external facing URL)
+change UI server service from `ClusterIP` to `LoadBalancer` (external facing URL)
 ```
 kubectl patch svc argocd-server -n $ARGO_NS -p '{"spec": {"type": "LoadBalancer"}}'
 ```
@@ -32,7 +46,7 @@ obtain external facing URL
 kubectl get service -n $ARGO_NS argocd-server
 ```
 
-obtain initial password
+obtain initial `password`
 ```
 argocd admin initial-password -n $ARGO_NS
 ```
@@ -42,7 +56,7 @@ backup if the previous command fails
 kubectl -n $ARGO_NS get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
-connect to argocd using cli with user 'admin', password from previous command, and external facing URL
+connect to argocd using cli with user '`admin`', `password` from previous command, and `EXTERNAL-IP` URL
 ```
 argocd login <EXTERNAL-IP>
 ```
@@ -56,6 +70,17 @@ login to the web ui in your browser
 ```
 https://<EXTERNAL-IP>
 ```
+#### Configure Dynatrace Prometheus Scrape
+update `argocd-metrics` kubernetes service with dynatrace annotations
+```
+kubectl apply -n $ARGO_NS -f argocd/2-7-9/argocd-metrics-service-with-dt.yaml
+```
+for reference:
+```
+annotations:
+    metrics.dynatrace.com/scrape: 'true'
+    metrics.dynatrace.com/port: '8082'
+```
 
 ### Configure App
 
@@ -63,23 +88,27 @@ https://<EXTERNAL-IP>
 https://argo-cd.readthedocs.io/en/stable/getting_started/#creating-apps-via-ui
 
 #### Using the CLI approach
-modify kubectl context to use your argocd namespace
+modify kubectl context to use your `argocd` namespace
 ```
 kubectl config set-context --current --namespace=$ARGO_NS
 ```
-set env variable APP_REPO
+set env variable `APP_REPO`
 ```
 export APP_REPO=https://github.com/<username>/<this-repo-name>.git
 ```
-set env variable APP_PATH
+set env variable `APP_PATH`
 ```
 export APP_PATH=app/simple-node-service/manifests
 ```
-set env variable APP_NS
+set env variable `APP_NS`
 ```
 export APP_NS=<your-name>-app
 ```
+create app namespace
+```
+kubectl create namespace $APP_NS
+```
 create app using argocd cli
 ```
-argocd app create guestbook --repo $APP_REPO --path $APP_PATH --dest-server https://kubernetes.default.svc --dest-namespace $APP_NS
+argocd app create $APP_NS --repo $APP_REPO --path $APP_PATH --dest-server https://kubernetes.default.svc --dest-namespace $APP_NS
 ```
