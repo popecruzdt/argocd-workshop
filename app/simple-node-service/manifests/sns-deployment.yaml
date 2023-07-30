@@ -20,12 +20,28 @@ spec:
       labels:
         application: simple-node-service
         tier: nodejs
+        app.kubernetes.io/version: 1.0.2
       name: simple-node-service
     spec:
       containers:
       - image: grabnerandi/simplenodeservice:1.0.2
         imagePullPolicy: IfNotPresent
         name: simple-node-service
+        env:
+        - name: DT_RELEASE_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/version']
+        - name: DT_RELEASE_BUILD_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/version']
+        - name: DT_RELEASE_STAGE
+          value: live
+        - name: DT_RELEASE_PRODUCT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         ports:
         - name: http
           protocol: TCP
