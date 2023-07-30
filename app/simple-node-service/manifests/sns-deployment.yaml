@@ -20,11 +20,11 @@ spec:
       labels:
         application: simple-node-service
         tier: nodejs
-        app.kubernetes.io/version: 1.0.2
+        app.kubernetes.io/version: 4.0.2
       name: simple-node-service
     spec:
       containers:
-      - image: grabnerandi/simplenodeservice:1.0.2
+      - image: grabnerandi/simplenodeservice:4.0.2
         imagePullPolicy: IfNotPresent
         name: simple-node-service
         env:
