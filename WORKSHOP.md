@@ -78,7 +78,7 @@ namespace: <your-name>-argocd
 ```
 apply the `ClusterRoleBinding`
 ```
-kubectl apply -f /argocd/2-7-9/argocd-cluster-role-binding.yaml
+kubectl apply -f argocd/2-7-9/argocd-cluster-role-binding.yaml
 ```
 
 #### Configure Dynatrace Prometheus Scrape
